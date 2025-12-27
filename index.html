@@ -1,1 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="index,follow" />
+  <title>Fik.Porn</title>
+  <meta name="description" content="Fik.Porn contains adult content intended for viewers 18+. Enter to confirm your age and access the site." />
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXC51GZB80"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DXC51GZB80');
+  </script>
+
+  <style>
+    :root{
+      --bg:#000000;
+      --muted:#B4B4B4;
+      --blue:#2F6FEA;
+      --white:#FFFFFF;
+      --cardMax:520px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    html, body{
+      height:100%;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--muted);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+      overflow:hidden;
+    }
+
+    .wrap{
+      height:100svh;
+      padding:24px 18px calc(24px + env(safe-area-inset-bottom));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card{
+      width:min(var(--cardMax), 100%);
+      height:100%;
+      max-height:calc(100svh - 48px - env(safe-area-inset-bottom));
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .top{
+      flex:0 0 auto;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .img18{
+      width:min(110px, 30vw);
+      height:auto;
+      display:block;
+      margin:0 auto 10px;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    .imgAdults{
+      width:min(270px, 65vw);
+      height:auto;
+      display:block;
+      margin:0 auto 14px;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    .warning{
+      font-weight:800;
+      font-size:16px;
+      letter-spacing:0;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin:0 0 14px;
+    }
+
+    .legalScroll{
+      flex:1 1 auto;
+      width:100%;
+      max-width:44ch;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:12px 0;
+      margin:0 auto 16px;
+    }
+
+    .legal{
+      font-size:14px;
+      line-height:1.45;
+      color:var(--muted);
+      opacity:0.95;
+      margin:0;
+      text-align:left;
+    }
+
+    .bottom{
+      flex:0 0 auto;
+      width:100%;
+      padding-top:8px;
+      padding-bottom:4px;
+    }
+
+    .btn{
+      width:50%;
+      max-width:260px;
+      min-width:180px;
+      margin:0 auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:999px;
+      padding:14px 18px;
+      font-weight:800;
+      font-size:16px;
+      letter-spacing:0;
+      color:var(--white);
+      background:var(--blue);
+      text-transform:uppercase;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .btn:active{ transform:scale(0.99); }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="card" id="gate">
+      <div class="top">
+        <img class="img18" src="/assets/IMG_7400.jpeg" alt="18+" />
+        <img class="imgAdults" src="/assets/IMG_7407.jpeg" alt="Adults only" />
+        <div class="warning">WARNING!</div>
+      </div>
+
+      <div class="legalScroll" aria-label="Legal notice">
+        <p class="legal">
+          By accessing this website, you confirm that you are <strong>18 years of age or older</strong>
+          (or the age of majority in your country) and that you are <strong>legally permitted</strong> to view adult
+          content under the laws of your local jurisdiction.<br><br>
+
+          You acknowledge that this website contains <strong>sexually explicit material</strong> intended exclusively
+          for adults. If you are under 18 years of age, or if viewing such material is prohibited in your country,
+          you must leave this website immediately.<br><br>
+
+          By entering, you agree that:
+          <br>• You will not allow any person under the age of 18 to access this content.
+          <br>• You access this website voluntarily and at your own risk.
+          <br>• You take full responsibility for complying with all applicable local laws.
+          <br>• You consent to the use of cookies and the processing of certain technical data necessary for the operation of this website.<br><br>
+
+          If you do not agree with these conditions, please leave this website now.
+        </p>
+      </div>
+
+      <div class="bottom">
+        <button class="btn" id="enterBtn" type="button">ENTER</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var KEY = "fik_age_ok";
+
+      function onAllowed(){
+        try { localStorage.setItem(KEY, "1"); } catch (e) {}
+      }
+
+      document.getElementById("enterBtn").addEventListener("click", function(){
+        onAllowed();
+
+        // ✅ okamžitá vizuální odezva (ať to nepůsobí mrtvě)
+        var btn = this;
+        btn.textContent = "ENTERED";
+        btn.disabled = true;
+        btn.style.opacity = "0.75";
+
+        // ✅ schovej právní scroll po vstupu
+        var legal = document.querySelector(".legalScroll");
+        if (legal) legal.style.display = "none";
+      });
+    })();
+  </script>
+</body>
+</html>
