@@ -1,13 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="robots" content="index,follow" />
   <title>Fik.Porn</title>
+
+  <meta name="robots" content="index,follow" />
   <meta name="description" content="Fik.Porn contains adult content intended for viewers 18+. Enter to confirm your age and access the site." />
 
-  <!-- Google tag (gtag.js) -->
+  <!-- FAVICONS (FIXED FILES) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/IMG_7512.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/assets/IMG_7513.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/IMG_7545.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/IMG_7546.png" />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Phosphor Icons (regular + bold) -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
+
+  <!-- GA4 (Fik.Porn) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXC51GZB80"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -17,29 +29,219 @@
   </script>
 
   <style>
-    :root{
-      --bg:#000000;
-      --muted:#B4B4B4;
-      --blue:#2F6FEA;
-      --white:#FFFFFF;
+    :root {
+      --bg:#000;
+      --fg:#fff;
+      --muted:#888;
+      --logo:60px;
+      --headline:clamp(28px, 6.5vw, 56px);
+      --twb:#00D9FF;
+      --safeSide:16px;
+      --navH:78px;
+      --iconSide:32px;      /* pravý sloupec */
+      --iconBottom:28px;    /* spodní lišta (všechny stejné) */
+      --glass: rgba(255,255,255,.06);
+      --glassStroke: rgba(255,255,255,.12);
+      --gateMuted:#B4B4B4;
+      --gateBlue:#2F6FEA;
+      --gateWhite:#FFFFFF;
       --cardMax:520px;
     }
-
-    *{ box-sizing:border-box; }
-
-    html, body{
-      height:100%;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+      display:grid; grid-template-rows:auto 1fr auto; min-height:100vh;
+      position:relative; overflow:hidden;
     }
 
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--muted);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
+    /* Background video stack – dvě vrstvy pro „karty“ */
+    #video-stack{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      z-index:-1;
+      background:#000;
+      touch-action:none; /* důležité: brání scrollu při drag-swipu */
+    }
+    .twincher-video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      background:#000;
+      transform:translateY(0px);
+      will-change:transform;
+    }
+
+    /* TOP: logo vlevo */
+    .top{
+      position:fixed;
+      top:12px;
+      left: 8px;
+      right:auto;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:12px;
+      z-index:3;
+      padding:0;
+    }
+    .logo{
+      height:var(--logo);
+      width:auto;
+      user-select:none;
+    }
+
+    /* FIXNÍ LUPA – zarovnaná k For You */
+    .search-fix{
+      position:fixed;
+      top:4px;          /* zarovnání k textu For You */
+      right:8px;
+      width:40px;
+      height:40px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:0;
+      color:#fff;
+      cursor:pointer;
+      z-index:3;
+    }
+    .search-fix .ph{
+      font-size:26px;    /* regular – stejná sada jako ostatní ikony */
+    }
+
+    /* TOP-CENTER: For You */
+    .top-center{
+      position:fixed; top:12px; left:50%; transform:translateX(-50%);
+      text-align:center; z-index:2; user-select:none; pointer-events:none;
+    }
+    .top-center .label{
+      color:#fff; font-weight:700; letter-spacing:.02em; font-size:16px; line-height:1.1;
+      text-shadow:0 2px 10px rgba(0,0,0,.35);
+    }
+    .top-center .arrow{ margin-top:3px; width:18px; height:12px; margin-inline:auto; }
+    .top-center .arrow svg{
+      width:18px; height:12px; display:block; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,.35));
+    }
+
+    /* Center stage */
+    .stage{
+      display:grid; place-items:center;
+      padding:24px var(--safeSide);
+      text-align:center; position:relative; z-index:1;
+      padding-bottom: calc(var(--navH) + 28px);
+    }
+
+    /* Right-side actions */
+    .side{
+      position: fixed;
+      right: 8px;
+      top: 55%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .side button{
+      appearance: none;
+      background: transparent;
+      border: 0;
+      width: 48px;
+      height: 48px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .side .ph{
+      font-size: var(--iconSide);
+    }
+    .count {
+      font-size: 11px;
+      color: rgba(255,255,255,0.9);
+      user-select: none;
+      line-height: 1;
+      margin-top: -5px;
+    }
+
+    /* Bottom nav */
+    .nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      background: transparent;
+      padding: 0 12px calc(-6px + env(safe-area-inset-bottom));
+      height: calc(44px + env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav button {
+      appearance: none;
+      background: transparent;
+      border: 0;
+      width: 48px;
+      height: 48px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .nav i {
+      font-size: var(--iconBottom); /* 28px */
+    }
+
+    /* Modal (profil) */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:5}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(92vw,560px);background:var(--glass);border:1px solid var(--glassStroke);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:20px}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 6px 12px}
+    .modal-title{margin:0;font-size:18px;font-weight:700;letter-spacing:.02em}
+    .modal-close{appearance:none;background:transparent;border:0;color:#fff;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+    .note{font-size:12px;color:#cbd5e1;opacity:.7;text-align:center;margin-top:6px}
+    .btn{appearance:none;border:0;border-radius:999px;padding:12px 18px;font-weight:600;cursor:pointer}
+    .btn.secondary{background:rgba(255,255,255,.1);color:#fff}
+    .btn.primary{background:rgba(255,255,255,.1);color:#fff}
+
+    /* ---------- AGE GATE OVERLAY ---------- */
+    #gateOverlay{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       overflow:hidden;
     }
+    #gateOverlay.hidden{ display:none; }
 
     .wrap{
       height:100svh;
@@ -47,8 +249,8 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      width:100%;
     }
-
     .card{
       width:min(var(--cardMax), 100%);
       height:100%;
@@ -58,15 +260,13 @@
       flex-direction:column;
       align-items:center;
     }
-
-    .top{
+    .top-g{
       flex:0 0 auto;
       width:100%;
       display:flex;
       flex-direction:column;
       align-items:center;
     }
-
     .img18{
       width:min(110px, 30vw);
       height:auto;
@@ -75,7 +275,6 @@
       user-select:none;
       -webkit-user-drag:none;
     }
-
     .imgAdults{
       width:min(270px, 65vw);
       height:auto;
@@ -84,16 +283,13 @@
       user-select:none;
       -webkit-user-drag:none;
     }
-
     .warning{
       font-weight:800;
       font-size:16px;
-      letter-spacing:0;
       text-transform:uppercase;
-      color:var(--muted);
+      color:var(--gateMuted);
       margin:0 0 14px;
     }
-
     .legalScroll{
       flex:1 1 auto;
       width:100%;
@@ -103,24 +299,21 @@
       padding:12px 0;
       margin:0 auto 16px;
     }
-
     .legal{
       font-size:14px;
       line-height:1.45;
-      color:var(--muted);
+      color:var(--gateMuted);
       opacity:0.95;
       margin:0;
       text-align:left;
     }
-
     .bottom{
       flex:0 0 auto;
       width:100%;
       padding-top:8px;
       padding-bottom:4px;
     }
-
-    .btn{
+    .enterBtn{
       width:50%;
       max-width:260px;
       min-width:180px;
@@ -134,74 +327,519 @@
       font-weight:800;
       font-size:16px;
       letter-spacing:0;
-      color:var(--white);
-      background:var(--blue);
+      color:var(--gateWhite);
+      background:var(--gateBlue);
       text-transform:uppercase;
       cursor:pointer;
       -webkit-tap-highlight-color:transparent;
     }
-
-    .btn:active{ transform:scale(0.99); }
+    .enterBtn:active{ transform:scale(0.99); }
   </style>
 </head>
 
 <body>
-  <main class="wrap">
-    <section class="card" id="gate">
-      <div class="top">
-        <img class="img18" src="/assets/IMG_7565.jpeg" alt="18+" />
-        <img class="imgAdults" src="/assets/IMG_7407.jpeg" alt="Adults only" />
-        <div class="warning">WARNING!</div>
+
+  <!-- AGE GATE OVERLAY -->
+  <div id="gateOverlay" aria-modal="true" role="dialog">
+    <main class="wrap">
+      <section class="card" id="gate">
+        <div class="top-g">
+          <img class="img18" src="/assets/IMG_7565.jpeg" alt="18+" />
+          <img class="imgAdults" src="/assets/IMG_7407.jpeg" alt="Adults only" />
+          <div class="warning">WARNING!</div>
+        </div>
+
+        <div class="legalScroll" aria-label="Legal notice">
+          <p class="legal">
+            By accessing this website, you confirm that you are <strong>18 years of age or older</strong>
+            (or the age of majority in your country) and that you are <strong>legally permitted</strong> to view adult
+            content under the laws of your local jurisdiction.<br><br>
+
+            You acknowledge that this website contains <strong>sexually explicit material</strong> intended exclusively
+            for adults. If you are under 18 years of age, or if viewing such material is prohibited in your country,
+            you must leave this website immediately.<br><br>
+
+            By entering, you agree that:
+            <br>• You will not allow any person under the age of 18 to access this content.
+            <br>• You access this website voluntarily and at your own risk.
+            <br>• You take full responsibility for complying with all applicable local laws.
+            <br>• You consent to the use of cookies and the processing of certain technical data necessary for the operation of this website.<br><br>
+
+            If you do not agree with these conditions, please leave this website now.
+          </p>
+        </div>
+
+        <div class="bottom">
+          <button class="enterBtn" id="enterBtn" type="button">ENTER</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Background video stack: current + next -->
+  <div id="video-stack" aria-hidden="true">
+    <video id="videoCurrent" class="twincher-video" playsinline></video>
+    <video id="videoNext" class="twincher-video" playsinline></video>
+  </div>
+
+  <!-- TOP: logo -->
+  <div class="top">
+    <img class="logo" src="/assets/IMG_7754.png" alt="Fik.Porn" width="60" height="60"/>
+  </div>
+
+  <!-- TOP-CENTER: For You -->
+  <div class="top-center" aria-hidden="true">
+    <div class="label">For You</div>
+    <div class="arrow">
+      <svg viewBox="0 0 24 14"><path d="M3 3l9 8 9-8"></path></svg>
+    </div>
+  </div>
+
+  <!-- FIXED SEARCH ICON (LUPA) -->
+  <button class="search-fix" aria-label="Search">
+    <i class="ph ph-magnifying-glass"></i>
+  </button>
+
+  <!-- CENTER -->
+  <main class="stage" aria-label="Hero"></main>
+
+  <!-- RIGHT: side actions -->
+  <aside class="side" aria-label="Actions">
+
+    <!-- SOUND TOGGLE (replaces Live camera) -->
+    <div class="stack">
+      <button id="soundToggle" aria-label="Sound: muted">
+        <i id="soundIcon" class="ph ph-speaker-simple-slash"></i>
+      </button>
+    </div>
+
+    <div class="stack">
+      <button aria-label="Like">
+        <i class="ph ph-heart"></i>
+      </button>
+      <div class="count">875</div>
+    </div>
+    <div class="stack">
+      <button aria-label="Comments">
+        <i class="ph ph-chat-circle-dots"></i>
+      </button>
+      <div class="count">47</div>
+    </div>
+    <div class="stack">
+      <button aria-label="Share">
+        <i class="ph ph-share-fat"></i>
+      </button>
+      <div class="count">112</div>
+    </div>
+  </aside>
+
+  <!-- MODAL: PROFILE (placeholder) -->
+  <div id="profileModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="profileTitle" class="modal-title">Your profile</h2>
+        <button class="modal-close" id="closeProfile" aria-label="Close">
+          <i class="ph ph-x"></i>
+        </button>
       </div>
-
-      <div class="legalScroll" aria-label="Legal notice">
-        <p class="legal">
-          By accessing this website, you confirm that you are <strong>18 years of age or older</strong>
-          (or the age of majority in your country) and that you are <strong>legally permitted</strong> to view adult
-          content under the laws of your local jurisdiction.<br><br>
-
-          You acknowledge that this website contains <strong>sexually explicit material</strong> intended exclusively
-          for adults. If you are under 18 years of age, or if viewing such material is prohibited in your country,
-          you must leave this website immediately.<br><br>
-
-          By entering, you agree that:
-          <br>• You will not allow any person under the age of 18 to access this content.
-          <br>• You access this website voluntarily and at your own risk.
-          <br>• You take full responsibility for complying with all applicable local laws.
-          <br>• You consent to the use of cookies and the processing of certain technical data necessary for the operation of this website.<br><br>
-
-          If you do not agree with these conditions, please leave this website now.
-        </p>
+      <div style="padding:20px; text-align:center;">
+        <p>Sign in or create your profile to save likes and unlock more.</p>
+        <div class="actions" style="justify-content:center; gap:10px;">
+          <button class="btn secondary" id="profileSignIn">Sign in</button>
+          <button class="btn primary" id="profileCreate">Create profile</button>
+        </div>
+        <div class="note">Adults only. Simple placeholder — full access flow later.</div>
       </div>
+    </div>
+  </div>
 
-      <div class="bottom">
-        <button class="btn" id="enterBtn" type="button">ENTER</button>
-      </div>
-    </section>
-  </main>
+  <!-- BOTTOM nav -->
+  <nav class="nav" aria-label="Primary">
+    <ul>
+      <li>
+        <button aria-label="Home">
+          <i class="ph ph-house"></i>
+        </button>
+      </li>
+      <li>
+        <button aria-label="Discover">
+          <i class="ph ph-squares-four"></i>
+        </button>
+      </li>
+      <li class="plus">
+        <button aria-label="Add">
+          <i class="ph-bold ph-plus"></i>
+        </button>
+      </li>
+      <li>
+        <button aria-label="Messages">
+          <i class="ph ph-chat-centered-text"></i>
+        </button>
+      </li>
+      <li>
+        <button id="profileBtn" aria-label="Profile">
+          <i class="ph ph-user"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
 
+  <!-- Playlist + modal + PRO swipe (drag + 25% threshold) -->
   <script>
-    (function () {
-      var KEY = "fik_age_ok";
+document.addEventListener('DOMContentLoaded', () => {
+  const SOURCES = [
+    'assets/feed-01.mp4',
+    'assets/feed-02.mp4',
+    'assets/feed-03.mp4',
+    'assets/feed-04.mp4'
+  ];
 
-      function onAllowed(){
-        try { localStorage.setItem(KEY, "1"); } catch (e) {}
-      }
+  // 2 vrstvy videa (stack)
+  let currentEl = document.getElementById('videoCurrent');
+  let nextEl    = document.getElementById('videoNext');
 
-      document.getElementById("enterBtn").addEventListener("click", function(){
-        onAllowed();
+  // lepší šance na plynulost
+  currentEl.preload = 'auto';
+  nextEl.preload = 'auto';
 
-        // ✅ okamžitá vizuální odezva (ať to nepůsobí mrtvě)
-        var btn = this;
-        btn.textContent = "ENTERED";
-        btn.disabled = true;
-        btn.style.opacity = "0.75";
+  let index = 0;
+  let isAnimating = false;
 
-        // ✅ schovej právní scroll po vstupu
-        var legal = document.querySelector(".legalScroll");
-        if (legal) legal.style.display = "none";
+  let dragging = false;
+  let startY = 0;
+  let startX = 0;
+  let dy = 0;
+  let preparedDir = 0; // +1 next, -1 prev
+  let raf = 0;
+
+  const THRESHOLD_RATIO = 0.25;
+  const MOVE_ACTIVATE_PX = 10;
+
+  /* ---- SOUND TOGGLE (Safari autoplay fix) ---- */
+  const soundBtn  = document.getElementById('soundToggle');
+  const soundIcon = document.getElementById('soundIcon');
+
+  function syncSoundUI() {
+    const isMuted = !!currentEl.muted;
+
+    if (soundIcon) {
+      soundIcon.className = `ph ${isMuted ? 'ph-speaker-simple-slash' : 'ph-speaker-simple-high'}`;
+    }
+    if (soundBtn) {
+      soundBtn.setAttribute('aria-label', isMuted ? 'Sound: muted' : 'Sound: on');
+    }
+  }
+
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      currentEl.muted = !currentEl.muted;
+      nextEl.muted = currentEl.muted;
+      tryPlay(currentEl);
+      syncSoundUI();
+    });
+  }
+
+  function vh() {
+    return Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+  }
+  function normalizeIndex(i) {
+    const len = SOURCES.length;
+    return (i % len + len) % len;
+  }
+  function setSource(el, src) {
+    if (el.src && el.src.endsWith(src)) return;
+    el.src = src;
+    el.load();
+  }
+  function tryPlay(el) {
+    return el.play().catch(() => {});
+  }
+
+  function isInteractiveTarget(target) {
+    return !!target?.closest('button, a, input, textarea, select, label, .nav, .side, .modal, .modal-backdrop, #gateOverlay');
+  }
+
+  function resetTransformsNoAnim() {
+    const height = vh();
+    currentEl.style.transition = 'none';
+    nextEl.style.transition = 'none';
+    currentEl.style.transform = 'translate3d(0,0,0)';
+    nextEl.style.transform = `translate3d(0,${height}px,0)`;
+  }
+
+  function initFirst() {
+    // iOS Safari: autoplay funguje spolehlivě jen při mute
+    currentEl.muted = true;
+    setSource(currentEl, SOURCES[index]);
+
+    tryPlay(currentEl);
+
+    // next zatím prázdné (jen mimo obraz)
+    nextEl.muted = currentEl.muted;
+    nextEl.removeAttribute('src');
+    nextEl.load();
+
+    resetTransformsNoAnim();
+    syncSoundUI();
+  }
+
+  function prepareNextForDirection(dir) {
+    if (preparedDir === dir) return;
+    preparedDir = dir;
+
+    const targetIndex = normalizeIndex(index + dir);
+    nextEl.muted = currentEl.muted;
+
+    setSource(nextEl, SOURCES[targetIndex]);
+
+    // připrav next mimo obraz
+    const height = vh();
+    nextEl.style.transition = 'none';
+    nextEl.style.transform =
+      dir > 0 ? `translate3d(0,${height}px,0)` : `translate3d(0,${-height}px,0)`;
+
+    // Warm-up: pokusit se spustit (v rámci gesta to často pomůže decode)
+    tryPlay(nextEl);
+  }
+
+  function applyDragTransforms() {
+    const height = vh();
+    currentEl.style.transform = `translate3d(0,${dy}px,0)`;
+
+    if (preparedDir > 0) {
+      nextEl.style.transform = `translate3d(0,${height + dy}px,0)`;
+    } else if (preparedDir < 0) {
+      nextEl.style.transform = `translate3d(0,${-height + dy}px,0)`;
+    }
+  }
+
+  function commit(dir) {
+    isAnimating = true;
+    const height = vh();
+    const duration = 200;
+
+    currentEl.style.transition = `transform ${duration}ms ease-out`;
+    nextEl.style.transition    = `transform ${duration}ms ease-out`;
+
+    currentEl.style.transform = `translate3d(0,${dir > 0 ? -height : height}px,0)`;
+    nextEl.style.transform    = 'translate3d(0,0,0)';
+
+    const onDone = (e) => {
+      if (e.propertyName !== 'transform') return;
+      currentEl.removeEventListener('transitionend', onDone);
+
+      // staré current stop
+      currentEl.pause?.();
+
+      // index se posune
+      index = normalizeIndex(index + dir);
+
+      // PROHOĎ ROLE (bez reloadů!)
+      const tmp = currentEl;
+      currentEl = nextEl;
+      nextEl = tmp;
+
+      // vyčistit/připravit next mimo obraz
+      nextEl.style.transition = 'none';
+      nextEl.style.transform = `translate3d(0,${height}px,0)`;
+      preparedDir = 0;
+
+      // current hraje dál (už bylo načtené)
+      tryPlay(currentEl);
+
+      // přepoj auto-advance na nové current
+      bindAutoAdvance();
+
+      // next zatím nezatěžujeme dalším loadem (připraví se až při dalším gesture)
+      nextEl.pause?.();
+      nextEl.removeAttribute('src');
+      nextEl.load();
+      nextEl.muted = currentEl.muted;
+
+      // reset current transform (už je na 0)
+      currentEl.style.transition = 'none';
+      currentEl.style.transform = 'translate3d(0,0,0)';
+
+      // sync UI stavu zvuku po prohození videí
+      syncSoundUI();
+
+      isAnimating = false;
+    };
+
+    currentEl.addEventListener('transitionend', onDone);
+  }
+
+  function snapBack() {
+    isAnimating = true;
+    const height = vh();
+    const duration = 200;
+
+    currentEl.style.transition = `transform ${duration}ms ease-out`;
+    nextEl.style.transition    = `transform ${duration}ms ease-out`;
+
+    currentEl.style.transform = 'translate3d(0,0,0)';
+    nextEl.style.transform =
+      preparedDir > 0 ? `translate3d(0,${height}px,0)` :
+      preparedDir < 0 ? `translate3d(0,${-height}px,0)` :
+      `translate3d(0,${height}px,0)`;
+
+    const onDone = (e) => {
+      if (e.propertyName !== 'transform') return;
+      currentEl.removeEventListener('transitionend', onDone);
+
+      nextEl.pause?.();
+      preparedDir = 0;
+      resetTransformsNoAnim();
+
+      // next zrušíme, aby nám nežralo decode/buffer
+      nextEl.removeAttribute('src');
+      nextEl.load();
+
+      isAnimating = false;
+    };
+
+    currentEl.addEventListener('transitionend', onDone);
+  }
+
+  // auto-advance vždy na aktuálním currentEl
+  let autoBoundEl = null;
+  function bindAutoAdvance() {
+    if (autoBoundEl) {
+      autoBoundEl.onended = null;
+      autoBoundEl.onerror = null;
+    }
+    autoBoundEl = currentEl;
+
+    autoBoundEl.onended = () => autoAdvance();
+    autoBoundEl.onerror = () => autoAdvance();
+  }
+
+  function autoAdvance() {
+    if (isAnimating || dragging) return;
+    // připrav next (dir +1) a commit bez dragu
+    prepareNextForDirection(1);
+
+    // start pozice
+    currentEl.style.transition = 'none';
+    nextEl.style.transition = 'none';
+    currentEl.style.transform = 'translate3d(0,0,0)';
+    nextEl.style.transform = `translate3d(0,${vh()}px,0)`;
+
+    void currentEl.offsetHeight; // reflow
+    commit(1);
+  }
+
+  /* ----- Gesture handlers ----- */
+  document.addEventListener('touchstart', (e) => {
+    if (isAnimating) return;
+    if (e.touches.length !== 1) return;
+    if (isInteractiveTarget(e.target)) return;
+
+    dragging = true;
+    preparedDir = 0;
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    dy = 0;
+
+    currentEl.style.transition = 'none';
+    nextEl.style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!dragging || isAnimating) return;
+    if (e.touches.length !== 1) return;
+
+    const y = e.touches[0].clientY;
+    const x = e.touches[0].clientX;
+    const ddy = y - startY;
+    const ddx = x - startX;
+
+    if (Math.abs(ddx) > Math.abs(ddy)) return;
+    if (Math.abs(ddy) < MOVE_ACTIVATE_PX) return;
+
+    e.preventDefault();
+    dy = ddy;
+
+    const dir = dy < 0 ? 1 : -1;
+    prepareNextForDirection(dir);
+
+    if (!raf) {
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        applyDragTransforms();
       });
-    })();
-  </script>
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!dragging || isAnimating) return;
+    dragging = false;
+
+    if (preparedDir === 0) { dy = 0; return; }
+
+    const threshold = Math.round(vh() * THRESHOLD_RATIO);
+    if (Math.abs(dy) >= threshold) commit(preparedDir);
+    else snapBack();
+
+    dy = 0;
+  }, { passive: true });
+
+  /* ----- Start ----- */
+  initFirst();
+  bindAutoAdvance();
+
+  /* ----- PROFILE modal (beze změny) ----- */
+  const profileBtn    = document.getElementById('profileBtn');
+  const profileModal  = document.getElementById('profileModal');
+  const closeProfile  = document.getElementById('closeProfile');
+
+  function openProfile(){ profileModal.classList.add('show'); }
+  function closeProfileFn(){ profileModal.classList.remove('show'); }
+
+  if (profileBtn)   profileBtn.addEventListener('click', openProfile);
+  if (closeProfile) closeProfile.addEventListener('click', closeProfileFn);
+  if (profileModal) {
+    profileModal.addEventListener('click', (e) => {
+      if (e.target === profileModal) closeProfileFn();
+    });
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (profileModal && profileModal.classList.contains('show')) closeProfileFn();
+    }
+  });
+
+  /* ----- AGE GATE toggle ----- */
+  const KEY = "fik_age_ok";
+  const gate = document.getElementById('gateOverlay');
+  const enterBtn = document.getElementById('enterBtn');
+
+  function hideGate(){
+    if (!gate) return;
+    gate.classList.add('hidden');
+  }
+  function showGate(){
+    if (!gate) return;
+    gate.classList.remove('hidden');
+  }
+
+  // If already allowed, skip gate
+  try {
+    if (localStorage.getItem(KEY) === "1") hideGate();
+    else showGate();
+  } catch(e) { showGate(); }
+
+  if (enterBtn) {
+    enterBtn.addEventListener('click', function(){
+      try { localStorage.setItem(KEY, "1"); } catch(e) {}
+      this.textContent = "ENTERED";
+      this.disabled = true;
+      this.style.opacity = "0.75";
+      hideGate();
+    });
+  }
+});
+</script>
 </body>
 </html>
