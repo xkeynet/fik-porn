@@ -221,6 +221,35 @@
       font-size: var(--iconBottom);
     }
 
+    .seek-wrap{
+      position:absolute;
+      left:12px;
+      right:12px;
+      top:-6px;
+      height:10px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:3;
+      pointer-events:auto;
+    }
+    .seek-pill{
+      width:100%;
+      height:4px;
+      border-radius:999px;
+      background: rgba(255,255,255,.22);
+      position:relative;
+      overflow:hidden;
+      touch-action: pan-y;
+    }
+    .seek-fill{
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:0%;
+      border-radius:999px;
+      background: rgba(255,255,255,.92);
+    }
+
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:5}
     .modal-backdrop.show{display:flex}
     .modal{width:min(92vw,560px);background:var(--glass);border:1px solid var(--glassStroke);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:20px}
@@ -451,6 +480,11 @@
   </div>
 
   <nav class="nav" aria-label="Primary">
+    <div class="seek-wrap" id="seekWrap" aria-hidden="true">
+      <div class="seek-pill" id="seekPill">
+        <div class="seek-fill" id="seekFill"></div>
+      </div>
+    </div>
     <ul>
       <li>
         <button aria-label="Home">
@@ -500,6 +534,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let imgCurrent   = document.getElementById('imgCurrent');
   let imgNext      = document.getElementById('imgNext');
 
+  const seekWrap = document.getElementById('seekWrap');
+  const seekPill = document.getElementById('seekPill');
+  const seekFill = document.getElementById('seekFill');
+
   videoCurrent.preload = 'auto';
   videoNext.preload = 'auto';
 
@@ -525,6 +563,13 @@ document.addEventListener('DOMContentLoaded', () => {
   let isMuted = true;
   let autoTimer = 0;
   let autoBoundVideo = null;
+
+  let progRaf = 0;
+  let pillTouching = false;
+  let pillSeeking = false;
+  let pillStartX = 0;
+  let pillStartY = 0;
+  let pillMoved = false;
 
   function syncSoundUI() {
     if (soundIcon) {
@@ -558,6 +603,64 @@ document.addEventListener('DOMContentLoaded', () => {
       autoBoundVideo.onended = null;
       autoBoundVideo.onerror = null;
       autoBoundVideo = null;
+    }
+  }
+
+  function stopProg() {
+    if (progRaf) cancelAnimationFrame(progRaf);
+    progRaf = 0;
+  }
+
+  function startProg() {
+    stopProg();
+    const tick = () => {
+      progRaf = 0;
+      const item = PLAYLIST[index];
+      if (item.type !== 'video') return;
+      const d = videoCurrent.duration;
+      if (d && isFinite(d) && d > 0) {
+        const p = Math.max(0, Math.min(1, videoCurrent.currentTime / d));
+        seekFill.style.width = (p * 100) + '%';
+      } else {
+        seekFill.style.width = '0%';
+      }
+      if (!videoCurrent.paused && !videoCurrent.ended) {
+        progRaf = requestAnimationFrame(tick);
+      }
+    };
+    progRaf = requestAnimationFrame(tick);
+  }
+
+  function showSeek(show) {
+    if (!seekWrap) return;
+    seekWrap.style.display = show ? 'flex' : 'none';
+    seekWrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+    if (!show) {
+      seekFill.style.width = '0%';
+      stopProg();
+    }
+  }
+
+  function seekToClientX(clientX) {
+    const d = videoCurrent.duration;
+    if (!d || !isFinite(d) || d <= 0) return;
+    const r = seekPill.getBoundingClientRect();
+    const x = Math.max(0, Math.min(r.width, clientX - r.left));
+    const t = (x / r.width) * d;
+    videoCurrent.currentTime = t;
+    const p = Math.max(0, Math.min(1, t / d));
+    seekFill.style.width = (p * 100) + '%';
+  }
+
+  function togglePlayPause() {
+    const item = PLAYLIST[index];
+    if (item.type !== 'video') return;
+    if (videoCurrent.paused || videoCurrent.ended) {
+      tryPlay(videoCurrent);
+      startProg();
+    } else {
+      videoCurrent.pause();
+      stopProg();
     }
   }
 
@@ -666,13 +769,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function bindAutoAdvanceForCurrent() {
     clearAuto();
+    stopProg();
+
     const item = PLAYLIST[index];
 
     if (item.type === 'video') {
+      showSeek(true);
       autoBoundVideo = videoCurrent;
       autoBoundVideo.onended = () => autoAdvance();
       autoBoundVideo.onerror = () => autoAdvance();
+      autoBoundVideo.onplay = () => startProg();
+      autoBoundVideo.onpause = () => stopProg();
+      autoBoundVideo.onloadedmetadata = () => startProg();
+      autoBoundVideo.onseeked = () => startProg();
+      startProg();
     } else {
+      showSeek(false);
       autoTimer = setTimeout(() => autoAdvance(), 3000);
     }
   }
@@ -680,6 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function commit(dir) {
     isAnimating = true;
     clearAuto();
+    stopProg();
 
     const height = vh();
     const duration = 200;
@@ -790,6 +903,68 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (seekPill) {
+    seekPill.addEventListener('touchstart', (e) => {
+      if (PLAYLIST[index].type !== 'video') return;
+      if (!e.touches || e.touches.length !== 1) return;
+      pillTouching = true;
+      pillSeeking = false;
+      pillMoved = false;
+      pillStartX = e.touches[0].clientX;
+      pillStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    seekPill.addEventListener('touchmove', (e) => {
+      if (!pillTouching) return;
+      if (PLAYLIST[index].type !== 'video') return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const x = e.touches[0].clientX;
+      const y = e.touches[0].clientY;
+      const dx = x - pillStartX;
+      const dy2 = y - pillStartY;
+
+      if (!pillSeeking) {
+        if (Math.abs(dx) > Math.abs(dy2) && Math.abs(dx) > 6) pillSeeking = true;
+        else if (Math.abs(dy2) > Math.abs(dx) && Math.abs(dy2) > 6) { pillTouching = false; return; }
+        else return;
+      }
+
+      pillMoved = true;
+      e.preventDefault();
+      e.stopPropagation();
+      seekToClientX(x);
+    }, { passive: false });
+
+    seekPill.addEventListener('touchend', (e) => {
+      if (PLAYLIST[index].type !== 'video') { pillTouching = false; pillSeeking = false; return; }
+      const wasMoved = pillMoved;
+      pillTouching = false;
+      pillSeeking = false;
+      pillMoved = false;
+
+      if (!wasMoved) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        togglePlayPause();
+      }
+    }, { passive: false });
+
+    seekPill.addEventListener('click', (e) => {
+      if (PLAYLIST[index].type !== 'video') return;
+      if (pillMoved) return;
+      e.preventDefault();
+      togglePlayPause();
+    });
+  }
+
+  if (layerCurrent) {
+    layerCurrent.addEventListener('click', (e) => {
+      if (isInteractiveTarget(e.target)) return;
+      if (PLAYLIST[index].type !== 'video') return;
+      togglePlayPause();
+    });
+  }
+
   function initFirst() {
     isMuted = true;
     syncSoundUI();
@@ -816,6 +991,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dy = 0;
 
     clearAuto();
+    stopProg();
 
     layerCurrent.style.transition = 'none';
     layerNext.style.transition = 'none';
