@@ -78,8 +78,12 @@
       background:#000;
       display:none;
     }
-    .twincher-layer video{ display:none; }
-    .twincher-layer img{ display:none; }
+    .twincher-layer img{
+      opacity:0;
+      transition: opacity 120ms linear;
+      -webkit-user-drag:none;
+      user-select:none;
+    }
 
     .top{
       position:fixed;
@@ -497,6 +501,9 @@ document.addEventListener('DOMContentLoaded', () => {
   videoCurrent.preload = 'auto';
   videoNext.preload = 'auto';
 
+  imgCurrent.decoding = 'async';
+  imgNext.decoding = 'async';
+
   let index = 0;
   let isAnimating = false;
 
@@ -557,6 +564,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const im = layer.querySelector('img');
     v.style.display = 'none';
     im.style.display = 'none';
+    im.style.opacity = '0';
+    im.onload = null;
+    im.onerror = null;
   }
 
   function setVideo(el, src) {
@@ -571,13 +581,31 @@ document.addEventListener('DOMContentLoaded', () => {
     el.load();
   }
 
-  function setImage(el, src) {
-    if (el.getAttribute('src') === src) return;
-    el.src = src;
+  function clearImage(el) {
+    el.onload = null;
+    el.onerror = null;
+    el.style.opacity = '0';
+    el.style.display = 'none';
+    el.removeAttribute('src');
   }
 
-  function clearImage(el) {
-    el.removeAttribute('src');
+  function setImageSafe(el, src) {
+    el.onload = null;
+    el.onerror = null;
+    el.style.opacity = '0';
+    el.style.display = 'block';
+
+    el.onload = () => {
+      el.style.opacity = '1';
+    };
+    el.onerror = () => {
+      el.style.opacity = '0';
+      el.style.display = 'none';
+    };
+
+    if (el.getAttribute('src') !== src) {
+      el.src = src;
+    }
   }
 
   function setLayerContent(layer, item, forNext) {
@@ -590,18 +618,13 @@ document.addEventListener('DOMContentLoaded', () => {
       v.style.display = 'block';
       v.muted = isMuted;
       setVideo(v, item.src);
-      if (forNext) {
-        tryPlay(v);
-      } else {
-        tryPlay(v);
-      }
-      return { kind: 'video', video: v, img: im };
+      tryPlay(v);
+      return;
     } else {
       v.style.display = 'none';
-      im.style.display = 'block';
       clearVideo(v);
-      setImage(im, item.src);
-      return { kind: 'image', video: v, img: im };
+      setImageSafe(im, item.src);
+      return;
     }
   }
 
