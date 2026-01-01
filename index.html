@@ -8,18 +8,15 @@
   <meta name="robots" content="index,follow" />
   <meta name="description" content="Fik.Porn contains adult content intended for viewers 18+. Enter to confirm your age and access the site." />
 
-  <!-- FAVICONS (FIXED FILES) -->
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/IMG_7512.png" />
   <link rel="icon" type="image/png" sizes="48x48" href="/assets/IMG_7513.png" />
   <link rel="icon" type="image/png" sizes="96x96" href="/assets/IMG_7545.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/IMG_7546.png" />
   <meta name="theme-color" content="#000000" />
 
-  <!-- Phosphor Icons (regular + bold) -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" />
 
-  <!-- GA4 (Fik.Porn) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DXC51GZB80"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -38,8 +35,8 @@
       --twb:#00D9FF;
       --safeSide:16px;
       --navH:78px;
-      --iconSide:32px;      /* pravý sloupec */
-      --iconBottom:28px;    /* spodní lišta (všechny stejné) */
+      --iconSide:32px;
+      --iconBottom:28px;
       --glass: rgba(255,255,255,.06);
       --glassStroke: rgba(255,255,255,.12);
       --gateMuted:#B4B4B4;
@@ -56,27 +53,34 @@
       position:relative; overflow:hidden;
     }
 
-    /* Background video stack – dvě vrstvy pro „karty“ */
     #video-stack{
       position:fixed;
       inset:0;
       overflow:hidden;
       z-index:-1;
       background:#000;
-      touch-action:none; /* důležité: brání scrollu při drag-swipu */
+      touch-action:none;
     }
-    .twincher-video{
+    .twincher-layer{
+      position:absolute;
+      inset:0;
+      transform:translateY(0px);
+      will-change:transform;
+      background:#000;
+    }
+    .twincher-layer video,
+    .twincher-layer img{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
       object-fit:cover;
       background:#000;
-      transform:translateY(0px);
-      will-change:transform;
+      display:none;
     }
+    .twincher-layer video{ display:none; }
+    .twincher-layer img{ display:none; }
 
-    /* TOP: logo vlevo */
     .top{
       position:fixed;
       top:12px;
@@ -95,10 +99,9 @@
       user-select:none;
     }
 
-    /* FIXNÍ LUPA – zarovnaná k For You */
     .search-fix{
       position:fixed;
-      top:4px;          /* zarovnání k textu For You */
+      top:4px;
       right:8px;
       width:40px;
       height:40px;
@@ -112,10 +115,9 @@
       z-index:3;
     }
     .search-fix .ph{
-      font-size:26px;    /* regular – stejná sada jako ostatní ikony */
+      font-size:26px;
     }
 
-    /* TOP-CENTER: For You */
     .top-center{
       position:fixed; top:12px; left:50%; transform:translateX(-50%);
       text-align:center; z-index:2; user-select:none; pointer-events:none;
@@ -130,7 +132,6 @@
       filter: drop-shadow(0 1px 4px rgba(0,0,0,.35));
     }
 
-    /* Center stage */
     .stage{
       display:grid; place-items:center;
       padding:24px var(--safeSide);
@@ -138,7 +139,6 @@
       padding-bottom: calc(var(--navH) + 28px);
     }
 
-    /* Right-side actions */
     .side{
       position: fixed;
       right: 8px;
@@ -178,7 +178,6 @@
       margin-top: -5px;
     }
 
-    /* Bottom nav */
     .nav {
       position: fixed;
       left: 0;
@@ -215,10 +214,9 @@
       cursor: pointer;
     }
     .nav i {
-      font-size: var(--iconBottom); /* 28px */
+      font-size: var(--iconBottom);
     }
 
-    /* Modal (profil) */
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:5}
     .modal-backdrop.show{display:flex}
     .modal{width:min(92vw,560px);background:var(--glass);border:1px solid var(--glassStroke);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45);padding:20px}
@@ -230,7 +228,6 @@
     .btn.secondary{background:rgba(255,255,255,.1);color:#fff}
     .btn.primary{background:rgba(255,255,255,.1);color:#fff}
 
-    /* ---------- AGE GATE OVERLAY ---------- */
     #gateOverlay{
       position:fixed;
       inset:0;
@@ -339,7 +336,6 @@
 
 <body>
 
-  <!-- AGE GATE OVERLAY -->
   <div id="gateOverlay" aria-modal="true" role="dialog">
     <main class="wrap">
       <section class="card" id="gate">
@@ -376,18 +372,21 @@
     </main>
   </div>
 
-  <!-- Background video stack: current + next -->
   <div id="video-stack" aria-hidden="true">
-    <video id="videoCurrent" class="twincher-video" playsinline></video>
-    <video id="videoNext" class="twincher-video" playsinline></video>
+    <div id="layerCurrent" class="twincher-layer">
+      <video id="videoCurrent" playsinline></video>
+      <img id="imgCurrent" alt="" draggable="false" />
+    </div>
+    <div id="layerNext" class="twincher-layer">
+      <video id="videoNext" playsinline></video>
+      <img id="imgNext" alt="" draggable="false" />
+    </div>
   </div>
 
-  <!-- TOP: logo -->
   <div class="top">
     <img class="logo" src="/assets/IMG_7754.png" alt="Fik.Porn" width="60" height="60"/>
   </div>
 
-  <!-- TOP-CENTER: For You -->
   <div class="top-center" aria-hidden="true">
     <div class="label">For You</div>
     <div class="arrow">
@@ -395,18 +394,13 @@
     </div>
   </div>
 
-  <!-- FIXED SEARCH ICON (LUPA) -->
   <button class="search-fix" aria-label="Search">
     <i class="ph ph-magnifying-glass"></i>
   </button>
 
-  <!-- CENTER -->
   <main class="stage" aria-label="Hero"></main>
 
-  <!-- RIGHT: side actions -->
   <aside class="side" aria-label="Actions">
-
-    <!-- SOUND TOGGLE (replaces Live camera) -->
     <div class="stack">
       <button id="soundToggle" aria-label="Sound: muted">
         <i id="soundIcon" class="ph ph-speaker-simple-slash"></i>
@@ -433,7 +427,6 @@
     </div>
   </aside>
 
-  <!-- MODAL: PROFILE (placeholder) -->
   <div id="profileModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
     <div class="modal">
       <div class="modal-header">
@@ -453,7 +446,6 @@
     </div>
   </div>
 
-  <!-- BOTTOM nav -->
   <nav class="nav" aria-label="Primary">
     <ul>
       <li>
@@ -484,22 +476,26 @@
     </ul>
   </nav>
 
-  <!-- Playlist + modal + PRO swipe (drag + 25% threshold) -->
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const SOURCES = [
-    'assets/feed-01.mp4',
-    'assets/feed-02.mp4',
-    'assets/feed-06.mp4'
+  const PLAYLIST = [
+    { type: 'video', src: 'assets/feed-01.mp4' },
+    { type: 'image', src: 'assets/feed-01.jpg' },
+    { type: 'video', src: 'assets/feed-02.mp4' },
+    { type: 'image', src: 'assets/feed-02.jpg' },
+    { type: 'video', src: 'assets/feed-06.mp4' }
   ];
 
-  // 2 vrstvy videa (stack)
-  let currentEl = document.getElementById('videoCurrent');
-  let nextEl    = document.getElementById('videoNext');
+  let layerCurrent = document.getElementById('layerCurrent');
+  let layerNext    = document.getElementById('layerNext');
 
-  // lepší šance na plynulost
-  currentEl.preload = 'auto';
-  nextEl.preload = 'auto';
+  let videoCurrent = document.getElementById('videoCurrent');
+  let videoNext    = document.getElementById('videoNext');
+  let imgCurrent   = document.getElementById('imgCurrent');
+  let imgNext      = document.getElementById('imgNext');
+
+  videoCurrent.preload = 'auto';
+  videoNext.preload = 'auto';
 
   let index = 0;
   let isAnimating = false;
@@ -508,19 +504,20 @@ document.addEventListener('DOMContentLoaded', () => {
   let startY = 0;
   let startX = 0;
   let dy = 0;
-  let preparedDir = 0; // +1 next, -1 prev
+  let preparedDir = 0;
   let raf = 0;
 
   const THRESHOLD_RATIO = 0.25;
   const MOVE_ACTIVATE_PX = 10;
 
-  /* ---- SOUND TOGGLE (Safari autoplay fix) ---- */
   const soundBtn  = document.getElementById('soundToggle');
   const soundIcon = document.getElementById('soundIcon');
 
-  function syncSoundUI() {
-    const isMuted = !!currentEl.muted;
+  let isMuted = true;
+  let autoTimer = 0;
+  let autoBoundVideo = null;
 
+  function syncSoundUI() {
     if (soundIcon) {
       soundIcon.className = `ph ${isMuted ? 'ph-speaker-simple-slash' : 'ph-speaker-simple-high'}`;
     }
@@ -529,57 +526,91 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (soundBtn) {
-    soundBtn.addEventListener('click', () => {
-      currentEl.muted = !currentEl.muted;
-      nextEl.muted = currentEl.muted;
-      tryPlay(currentEl);
-      syncSoundUI();
-    });
-  }
-
   function vh() {
     return Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
   }
   function normalizeIndex(i) {
-    const len = SOURCES.length;
+    const len = PLAYLIST.length;
     return (i % len + len) % len;
-  }
-  function setSource(el, src) {
-    if (el.src && el.src.endsWith(src)) return;
-    el.src = src;
-    el.load();
   }
   function tryPlay(el) {
     return el.play().catch(() => {});
   }
-
   function isInteractiveTarget(target) {
     return !!target?.closest('button, a, input, textarea, select, label, .nav, .side, .modal, .modal-backdrop, #gateOverlay');
   }
 
-  function resetTransformsNoAnim() {
-    const height = vh();
-    currentEl.style.transition = 'none';
-    nextEl.style.transition = 'none';
-    currentEl.style.transform = 'translate3d(0,0,0)';
-    nextEl.style.transform = `translate3d(0,${height}px,0)`;
+  function clearAuto() {
+    if (autoTimer) {
+      clearTimeout(autoTimer);
+      autoTimer = 0;
+    }
+    if (autoBoundVideo) {
+      autoBoundVideo.onended = null;
+      autoBoundVideo.onerror = null;
+      autoBoundVideo = null;
+    }
   }
 
-  function initFirst() {
-    // iOS Safari: autoplay funguje spolehlivě jen při mute
-    currentEl.muted = true;
-    setSource(currentEl, SOURCES[index]);
+  function hideAll(layer) {
+    const v = layer.querySelector('video');
+    const im = layer.querySelector('img');
+    v.style.display = 'none';
+    im.style.display = 'none';
+  }
 
-    tryPlay(currentEl);
+  function setVideo(el, src) {
+    if (el.src && el.src.endsWith(src)) return;
+    el.src = src;
+    el.load();
+  }
 
-    // next zatím prázdné (jen mimo obraz)
-    nextEl.muted = currentEl.muted;
-    nextEl.removeAttribute('src');
-    nextEl.load();
+  function clearVideo(el) {
+    el.pause?.();
+    el.removeAttribute('src');
+    el.load();
+  }
 
-    resetTransformsNoAnim();
-    syncSoundUI();
+  function setImage(el, src) {
+    if (el.getAttribute('src') === src) return;
+    el.src = src;
+  }
+
+  function clearImage(el) {
+    el.removeAttribute('src');
+  }
+
+  function setLayerContent(layer, item, forNext) {
+    const v = layer.querySelector('video');
+    const im = layer.querySelector('img');
+    hideAll(layer);
+
+    if (item.type === 'video') {
+      im.style.display = 'none';
+      v.style.display = 'block';
+      v.muted = isMuted;
+      setVideo(v, item.src);
+      if (forNext) {
+        tryPlay(v);
+      } else {
+        tryPlay(v);
+      }
+      return { kind: 'video', video: v, img: im };
+    } else {
+      v.style.display = 'none';
+      im.style.display = 'block';
+      clearVideo(v);
+      setImage(im, item.src);
+      return { kind: 'image', video: v, img: im };
+    }
+  }
+
+  function resetTransformsNoAnim() {
+    const height = vh();
+    layerCurrent.style.transition = 'none';
+    layerNext.style.transition = 'none';
+    layerCurrent.style.transform = 'translate3d(0,0,0)';
+    layerNext.style.transform = `translate3d(0,${height}px,0)`;
   }
 
   function prepareNextForDirection(dir) {
@@ -587,85 +618,95 @@ document.addEventListener('DOMContentLoaded', () => {
     preparedDir = dir;
 
     const targetIndex = normalizeIndex(index + dir);
-    nextEl.muted = currentEl.muted;
+    const item = PLAYLIST[targetIndex];
 
-    setSource(nextEl, SOURCES[targetIndex]);
+    setLayerContent(layerNext, item, true);
 
-    // připrav next mimo obraz
     const height = vh();
-    nextEl.style.transition = 'none';
-    nextEl.style.transform =
+    layerNext.style.transition = 'none';
+    layerNext.style.transform =
       dir > 0 ? `translate3d(0,${height}px,0)` : `translate3d(0,${-height}px,0)`;
-
-    // Warm-up: pokusit se spustit (v rámci gesta to často pomůže decode)
-    tryPlay(nextEl);
   }
 
   function applyDragTransforms() {
     const height = vh();
-    currentEl.style.transform = `translate3d(0,${dy}px,0)`;
+    layerCurrent.style.transform = `translate3d(0,${dy}px,0)`;
 
     if (preparedDir > 0) {
-      nextEl.style.transform = `translate3d(0,${height + dy}px,0)`;
+      layerNext.style.transform = `translate3d(0,${height + dy}px,0)`;
     } else if (preparedDir < 0) {
-      nextEl.style.transform = `translate3d(0,${-height + dy}px,0)`;
+      layerNext.style.transform = `translate3d(0,${-height + dy}px,0)`;
+    }
+  }
+
+  function bindAutoAdvanceForCurrent() {
+    clearAuto();
+    const item = PLAYLIST[index];
+
+    if (item.type === 'video') {
+      autoBoundVideo = videoCurrent;
+      autoBoundVideo.onended = () => autoAdvance();
+      autoBoundVideo.onerror = () => autoAdvance();
+    } else {
+      autoTimer = setTimeout(() => autoAdvance(), 3000);
     }
   }
 
   function commit(dir) {
     isAnimating = true;
+    clearAuto();
+
     const height = vh();
     const duration = 200;
 
-    currentEl.style.transition = `transform ${duration}ms ease-out`;
-    nextEl.style.transition    = `transform ${duration}ms ease-out`;
+    layerCurrent.style.transition = `transform ${duration}ms ease-out`;
+    layerNext.style.transition    = `transform ${duration}ms ease-out`;
 
-    currentEl.style.transform = `translate3d(0,${dir > 0 ? -height : height}px,0)`;
-    nextEl.style.transform    = 'translate3d(0,0,0)';
+    layerCurrent.style.transform = `translate3d(0,${dir > 0 ? -height : height}px,0)`;
+    layerNext.style.transform    = 'translate3d(0,0,0)';
 
     const onDone = (e) => {
       if (e.propertyName !== 'transform') return;
-      currentEl.removeEventListener('transitionend', onDone);
+      layerCurrent.removeEventListener('transitionend', onDone);
 
-      // staré current stop
-      currentEl.pause?.();
-
-      // index se posune
       index = normalizeIndex(index + dir);
 
-      // PROHOĎ ROLE (bez reloadů!)
-      const tmp = currentEl;
-      currentEl = nextEl;
-      nextEl = tmp;
+      const tmpLayer = layerCurrent;
+      layerCurrent = layerNext;
+      layerNext = tmpLayer;
 
-      // vyčistit/připravit next mimo obraz
-      nextEl.style.transition = 'none';
-      nextEl.style.transform = `translate3d(0,${height}px,0)`;
+      const tmpV = videoCurrent;
+      videoCurrent = videoNext;
+      videoNext = tmpV;
+
+      const tmpI = imgCurrent;
+      imgCurrent = imgNext;
+      imgNext = tmpI;
+
+      layerNext.style.transition = 'none';
+      layerNext.style.transform = `translate3d(0,${height}px,0)`;
       preparedDir = 0;
 
-      // current hraje dál (už bylo načtené)
-      tryPlay(currentEl);
+      const currentItem = PLAYLIST[index];
+      if (currentItem.type === 'video') {
+        videoCurrent.muted = isMuted;
+        tryPlay(videoCurrent);
+      }
 
-      // přepoj auto-advance na nové current
-      bindAutoAdvance();
+      clearVideo(videoNext);
+      clearImage(imgNext);
+      hideAll(layerNext);
 
-      // next zatím nezatěžujeme dalším loadem (připraví se až při dalším gesture)
-      nextEl.pause?.();
-      nextEl.removeAttribute('src');
-      nextEl.load();
-      nextEl.muted = currentEl.muted;
+      layerCurrent.style.transition = 'none';
+      layerCurrent.style.transform = 'translate3d(0,0,0)';
 
-      // reset current transform (už je na 0)
-      currentEl.style.transition = 'none';
-      currentEl.style.transform = 'translate3d(0,0,0)';
-
-      // sync UI stavu zvuku po prohození videí
       syncSoundUI();
+      bindAutoAdvanceForCurrent();
 
       isAnimating = false;
     };
 
-    currentEl.addEventListener('transitionend', onDone);
+    layerCurrent.addEventListener('transitionend', onDone);
   }
 
   function snapBack() {
@@ -673,62 +714,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const height = vh();
     const duration = 200;
 
-    currentEl.style.transition = `transform ${duration}ms ease-out`;
-    nextEl.style.transition    = `transform ${duration}ms ease-out`;
+    layerCurrent.style.transition = `transform ${duration}ms ease-out`;
+    layerNext.style.transition    = `transform ${duration}ms ease-out`;
 
-    currentEl.style.transform = 'translate3d(0,0,0)';
-    nextEl.style.transform =
+    layerCurrent.style.transform = 'translate3d(0,0,0)';
+    layerNext.style.transform =
       preparedDir > 0 ? `translate3d(0,${height}px,0)` :
       preparedDir < 0 ? `translate3d(0,${-height}px,0)` :
       `translate3d(0,${height}px,0)`;
 
     const onDone = (e) => {
       if (e.propertyName !== 'transform') return;
-      currentEl.removeEventListener('transitionend', onDone);
+      layerCurrent.removeEventListener('transitionend', onDone);
 
-      nextEl.pause?.();
       preparedDir = 0;
       resetTransformsNoAnim();
 
-      // next zrušíme, aby nám nežralo decode/buffer
-      nextEl.removeAttribute('src');
-      nextEl.load();
+      clearVideo(videoNext);
+      clearImage(imgNext);
+      hideAll(layerNext);
 
+      bindAutoAdvanceForCurrent();
       isAnimating = false;
     };
 
-    currentEl.addEventListener('transitionend', onDone);
-  }
-
-  // auto-advance vždy na aktuálním currentEl
-  let autoBoundEl = null;
-  function bindAutoAdvance() {
-    if (autoBoundEl) {
-      autoBoundEl.onended = null;
-      autoBoundEl.onerror = null;
-    }
-    autoBoundEl = currentEl;
-
-    autoBoundEl.onended = () => autoAdvance();
-    autoBoundEl.onerror = () => autoAdvance();
+    layerCurrent.addEventListener('transitionend', onDone);
   }
 
   function autoAdvance() {
     if (isAnimating || dragging) return;
-    // připrav next (dir +1) a commit bez dragu
     prepareNextForDirection(1);
 
-    // start pozice
-    currentEl.style.transition = 'none';
-    nextEl.style.transition = 'none';
-    currentEl.style.transform = 'translate3d(0,0,0)';
-    nextEl.style.transform = `translate3d(0,${vh()}px,0)`;
+    layerCurrent.style.transition = 'none';
+    layerNext.style.transition = 'none';
+    layerCurrent.style.transform = 'translate3d(0,0,0)';
+    layerNext.style.transform = `translate3d(0,${vh()}px,0)`;
 
-    void currentEl.offsetHeight; // reflow
+    void layerCurrent.offsetHeight;
     commit(1);
   }
 
-  /* ----- Gesture handlers ----- */
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      if (PLAYLIST[index].type === 'video') {
+        videoCurrent.muted = isMuted;
+        tryPlay(videoCurrent);
+      }
+      syncSoundUI();
+    });
+  }
+
+  function initFirst() {
+    isMuted = true;
+    syncSoundUI();
+
+    setLayerContent(layerCurrent, PLAYLIST[index], false);
+    resetTransformsNoAnim();
+
+    clearVideo(videoNext);
+    clearImage(imgNext);
+    hideAll(layerNext);
+
+    bindAutoAdvanceForCurrent();
+  }
+
   document.addEventListener('touchstart', (e) => {
     if (isAnimating) return;
     if (e.touches.length !== 1) return;
@@ -740,8 +790,10 @@ document.addEventListener('DOMContentLoaded', () => {
     startX = e.touches[0].clientX;
     dy = 0;
 
-    currentEl.style.transition = 'none';
-    nextEl.style.transition = 'none';
+    clearAuto();
+
+    layerCurrent.style.transition = 'none';
+    layerNext.style.transition = 'none';
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
@@ -774,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dragging || isAnimating) return;
     dragging = false;
 
-    if (preparedDir === 0) { dy = 0; return; }
+    if (preparedDir === 0) { dy = 0; bindAutoAdvanceForCurrent(); return; }
 
     const threshold = Math.round(vh() * THRESHOLD_RATIO);
     if (Math.abs(dy) >= threshold) commit(preparedDir);
@@ -783,11 +835,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dy = 0;
   }, { passive: true });
 
-  /* ----- Start ----- */
   initFirst();
-  bindAutoAdvance();
 
-  /* ----- PROFILE modal (beze změny) ----- */
   const profileBtn    = document.getElementById('profileBtn');
   const profileModal  = document.getElementById('profileModal');
   const closeProfile  = document.getElementById('closeProfile');
@@ -809,7 +858,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ----- AGE GATE toggle ----- */
   const KEY = "fik_age_ok";
   const gate = document.getElementById('gateOverlay');
   const enterBtn = document.getElementById('enterBtn');
@@ -823,7 +871,6 @@ document.addEventListener('DOMContentLoaded', () => {
     gate.classList.remove('hidden');
   }
 
-  // If already allowed, skip gate
   try {
     if (localStorage.getItem(KEY) === "1") hideGate();
     else showGate();
